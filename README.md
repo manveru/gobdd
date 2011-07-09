@@ -101,6 +101,25 @@ Then, to run the tests, use either of these:
 	  return "", true
 	}
 
+Your custom matchers may take any number of arguments of any type your heart so desires. For example:
+
+	func ToBeInside(obj interface{}, array []string) (string, bool) {
+	  found := false
+  
+	  for _, v := range array {
+	    if obj == v { found = true }
+	  }
+  
+	  if !found {
+	    return fmt.Sprintf(
+			"expected to find: %v\n"+
+			"        in array: %v\n", obj, array), false
+	  }
+	  return "", true
+	}
+
+will then work with `Expect("foo", ToBeInside, []string{"foo"})`
+
 ## License
 
 Public domain

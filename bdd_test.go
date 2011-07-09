@@ -208,9 +208,30 @@ func init() {
         Expect(func() {}, ToNotPanic)
       })
       
+      Describe("custom matchers", func() {
+        It("can take your own specified number of arguments", func() {
+          Expect("foo", ToBeInside, []string{"foo"})
+        })
+      })
+      
     })
     
   })
+}
+
+func ToBeInside(obj interface{}, array []string) (string, bool) {
+  found := false
+  
+  for _, v := range array {
+    if obj == v { found = true }
+  }
+  
+  if !found {
+    return fmt.Sprintf(
+		"expected to find: %v\n"+
+		"        in array: %v\n", obj, array), false
+  }
+  return "", true
 }
 
 func assertDeepEqualObjects(t *testing.T, obj interface{}, expected interface{}) {
