@@ -9,7 +9,11 @@ It's pretty cool.
 
 ## Usage
 
-Inside a normal gotest-style file (ie, *_test.go) add the following:
+Create a gotest-style file (ie, *_test.go) containing the following:
+
+	package my_cool_app
+	
+	import . "gobdd"
 
 	func init() {
 	  defer PrintSpecReport()
@@ -78,3 +82,25 @@ Inside a normal gotest-style file (ie, *_test.go) add the following:
     
 	  })
 	}
+
+Then, to run the tests, use either of these:
+
+	make test
+	gotest
+
+(It's just the same as running tests using the built-in testing framework.)
+
+## Writing your own matchers
+
+	func ToBeTruthy(obj interface{}) (string, bool) {
+	  if obj != true {
+	    return fmt.Sprintf(
+			"expected: true\n"+
+			"     got: %v\n", obj), false
+	  }
+	  return "", true
+	}
+
+## License
+
+Public domain
