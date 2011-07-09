@@ -162,34 +162,54 @@ func init() {
     return &MyGreatTestType{}
   }
   
+  var anObject *MyGreatTestType
+  
   Describe("matchers", func() {
+    
+    BeforeEach(func() {
+      anObject = new(MyGreatTestType)
+      anObject.Name = "john"
+      anObject.Age = 23
+    })
+    
     Describe("not equals", func() {
+      
       It("matches on simple objects", func() {
-        Expect(&MyGreatTestType{"john", 23}, ToNotEqual, &MyGreatTestType{"john", 23})
+        Expect(&MyGreatTestType{"john", 23}, ToNotEqual, anObject)
         Expect("foo", ToEqual, "foo")
         Expect("foo", ToNotEqual, "bar")
       })
+      
       It("matches for typed-nil", func() {
         Expect(MyNil(), ToBeNil)
         Expect(MyNonNil(), ToNotBeNil)
       })
+      
       It("matches for nil", func() {
         // Expect(nil, ToBeNil)
         Expect(true, ToNotBeNil)
       })
+      
     })
+    
     Describe("deep equals matcher", func() {
+      
       It("matches what equals does not", func() {
-        Expect(&MyGreatTestType{"john", 23}, ToDeepEqual, &MyGreatTestType{"john", 23})
+        Expect(&MyGreatTestType{"john", 23}, ToDeepEqual, anObject)
         Expect("foo", ToDeepEqual, "foo")
       })
+      
     })
+    
     Describe("exception-rescuing matchers", func() {
+      
       It("is super cool", func() {
         Expect(func() { panic("foobar!") }, ToPanicWith, "foobar!")
         Expect(func() {}, ToNotPanic)
       })
+      
     })
+    
   })
 }
 
