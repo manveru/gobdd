@@ -56,7 +56,7 @@ Create a gotest-style file (ie, *_test.go) containing the following:
 	      })
       
 	      It("matches for nil", func() {
-	        // Expect(nil, ToBeNil)
+	        Expect(nil, ToBeNil)
 	        Expect(true, ToNotBeNil)
 	      })
       

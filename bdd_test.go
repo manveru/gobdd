@@ -158,6 +158,10 @@ func init() {
     return nil
   }
   
+  MyInterfaceNil := func() interface{} {
+    return nil
+  }
+
   MyNonNil := func() *MyGreatTestType {
     return &MyGreatTestType{}
   }
@@ -182,11 +186,12 @@ func init() {
       
       It("matches for typed-nil", func() {
         Expect(MyNil(), ToBeNil)
+        Expect(MyInterfaceNil(), ToBeNil)
         Expect(MyNonNil(), ToNotBeNil)
       })
       
       It("matches for nil", func() {
-        // Expect(nil, ToBeNil)
+        Expect(nil, ToBeNil)
         Expect(true, ToNotBeNil)
       })
       

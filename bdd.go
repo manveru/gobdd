@@ -62,13 +62,28 @@ func getErrorLine() string {
   return fmt.Sprintf("%s:%d", file, line)
 }
 
+type validNilType interface{}
+func validNil() *validNilType { return nil }
+
+func appendValueFor(array []reflect.Value, obj interface{}) []reflect.Value {
+  var value reflect.Value
+  if reflect.TypeOf(obj) == nil {
+    value = reflect.ValueOf(validNil())
+  } else {
+    value = reflect.ValueOf(obj)
+  }
+  return append(array, value)
+}
+
 func Expect(obj interface{}, test interface{}, args ...interface{}) {
   var argValues []reflect.Value
-  argValues = append(argValues, reflect.ValueOf(obj))
+  
+  argValues = appendValueFor(argValues, obj)
   for _, v := range args {
-    argValues = append(argValues, reflect.ValueOf(v))
+    argValues = appendValueFor(argValues, v)
   }
   
+  // fmt.Println(obj, reflect.ValueOf(obj), argValues, reflect.TypeOf(obj) == nil)
   returnValues := reflect.ValueOf(test).Call(argValues)
   str, ok := returnValues[0].String(), returnValues[1].Bool()
   
