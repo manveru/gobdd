@@ -83,6 +83,11 @@ Create a gotest-style file (ie, *_test.go) containing the following:
 	  })
 	}
 
+Next, add the following lines to *only one* of your _test.go files:
+
+	import "testing"
+	func TestEverything(t *testing.T) {}
+
 Then, to run the tests, use either of these:
 
 	make test
