@@ -250,3 +250,11 @@ func assertEqualObjects(t *testing.T, obj interface{}, expected interface{}) {
     t.Errorf("expected [%v] to equal [%v]", expected, obj)
   }
 }
+
+func TestExceptions(t *testing.T) {
+  foo := rescueException(func() { panic("foo") })
+  assertEqualObjects(t, foo, "foo")
+  
+  none := rescueException(func() {})
+  assertEqualObjects(t, none, nil)
+}
