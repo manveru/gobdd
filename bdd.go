@@ -22,10 +22,6 @@ type testingError struct {
   ErrorLine string
 }
 
-type Expectation struct {
-  value interface{}
-}
-
 var debugTesting = false
 var testingContexts []*context
 var testingCurrentIt string
@@ -66,56 +62,72 @@ func getErrorLine() string {
   return fmt.Sprintf("%s:%d", file, line)
 }
 
-func Expect(obj interface{}) *Expectation {
-  return &Expectation{obj}
-}
-
-func (e *Expectation) toEqual(obj interface{}) {
-  if e.value != obj {
-    addErrorObject("expected: %v\n     got: %v\n", obj, e.value)
+func Expect(obj interface{}, test interface{}, args ...interface{}) {
+  var argValues []reflect.Value
+  argValues = append(argValues, reflect.ValueOf(obj))
+  for _, v := range args {
+    argValues = append(argValues, reflect.ValueOf(v))
   }
-}
-
-func (e *Expectation) toNotEqual(obj interface{}) {
-  if e.value == obj {
-    addErrorObject(" expected: %v\nto not be: %v\n", obj, e.value)
-  }
-}
-
-func (e *Expectation) toDeepEqual(obj interface{}) {
-  if !reflect.DeepEqual(e.value, obj) {
-    addErrorObject("    expected: %v\nto deeply be: %v\n", obj, e.value)
-  }
-}
-
-func (e *Expectation) toBeNil() {
-  if !reflect.DeepEqual(reflect.ValueOf(nil), reflect.Indirect(reflect.ValueOf(e.value))) {
-    addErrorObject("expected to be nil,\n           but got: %v\n", e.value)
-  }
-}
-
-func (e *Expectation) toNotBeNil() {
-  if reflect.DeepEqual(reflect.ValueOf(nil), reflect.Indirect(reflect.ValueOf(e.value))) {
-    addErrorObject("expected to not be nil,\n               but got: nil\n")
-  }
-}
-
-func (e *Expectation) toPanicWith(obj interface{}) {
-  fn := e.value.(func())
-  actual := rescueException(fn)
   
-  if actual != obj {
-    addErrorObject("expected panic: %v\n           got: %v\n", obj, actual)
+  returnValues := reflect.ValueOf(test).Call(argValues)
+  str, ok := returnValues[0].String(), returnValues[1].Bool()
+  
+  if !ok {
+    addErrorObject(str)
   }
 }
 
-func (e *Expectation) toNotPanic() {
-  fn := e.value.(func())
-  actual := rescueException(fn)
+func ToEqual(actual interface{}, expected interface{}) (string, bool) {
+  if actual != expected {
+    return fmt.Sprintf("expected: %v\n     got: %v\n", expected, actual), false
+  }
+  return "", true
+}
+
+func ToNotEqual(actual interface{}, expected interface{}) (string, bool) {
+  if expected == actual {
+    return fmt.Sprintf(" expected: %v\nto not be: %v\n", expected, actual), false
+  }
+  return "", true
+}
+
+func ToBeNil(actual interface{}) (string, bool) {
+  if !reflect.DeepEqual(reflect.ValueOf(nil), reflect.Indirect(reflect.ValueOf(actual))) {
+    return fmt.Sprintf("expected to be nil,\n           but got: %v\n", actual), false
+  }
+  return "", true
+}
+
+func ToNotBeNil(actual interface{}) (string, bool) {
+  if reflect.DeepEqual(reflect.ValueOf(nil), reflect.Indirect(reflect.ValueOf(actual))) {
+    return "expected to not be nil,\n               but got: nil\n", false
+  }
+  return "", true
+}
+
+func ToDeepEqual(actual interface{}, expected interface{}) (string, bool) {
+  if !reflect.DeepEqual(actual, expected) {
+    return fmt.Sprintf("    expected: %v\nto deeply be: %v\n", expected, actual), false
+  }
+  return "", true
+}
+
+func ToPanicWith(actual interface{}, expected interface{}) (string, bool) {
+  actual = rescueException(actual.(func()))
+  
+  if actual != expected {
+    return fmt.Sprintf("expected panic: %v\n           got: %v\n", expected, actual), false
+  }
+  return "", true
+}
+
+func ToNotPanic(actual interface{}) (string, bool) {
+  actual = rescueException(actual.(func()))
   
   if actual != nil {
-    addErrorObject("expected no panic,\n          but got: %v\n", actual)
+    return fmt.Sprintf("expected no panic,\n          but got: %v\n", actual), false
   }
+  return "", true
 }
 
 func rescueException(try func()) (out interface{}) {
@@ -127,9 +139,7 @@ func rescueException(try func()) (out interface{}) {
   return nil
 }
 
-func addErrorObject(s string, args ...interface{}) {
-  s = fmt.Sprintf(s, args...)
-  
+func addErrorObject(s string) {
   var contexts []string
   for _, testingContext := range testingContexts {
     contexts = append(contexts, testingContext.Description)

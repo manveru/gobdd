@@ -81,8 +81,8 @@ func TestEqualAssertion(t *testing.T) {
   Describe("foo", func() {
     Describe("bar", func() {
       It("is good", func() {
-        Expect(42).toEqual(42)
-        Expect(24).toEqual(23)
+        Expect(42, ToEqual, 42)
+        Expect(24, ToEqual, 23)
       })
     })
   })
@@ -100,10 +100,10 @@ func TestPrintSpecReport(t *testing.T) {
   Describe("foo", func() {
     Describe("bar", func() {
       It("is cool", func() {
-        Expect(23).toEqual(24)
+        Expect(23, ToEqual, 24)
       })
       It("is lame", func() {
-        Expect(23).toEqual(23)
+        Expect(23, ToEqual, 23)
       })
     })
   })
@@ -129,10 +129,10 @@ func TestPrintGreen(t *testing.T) {
   Describe("foo", func() {
     Describe("bar", func() {
       It("is cool", func() {
-        Expect(23).toEqual(23)
+        Expect(23, ToEqual, 23)
       })
       It("is cool", func() {
-        Expect(23).toEqual(23)
+        Expect(23, ToEqual, 23)
       })
     })
   })
@@ -165,29 +165,29 @@ func init() {
   Describe("matchers", func() {
     Describe("not equals", func() {
       It("matches on simple objects", func() {
-        Expect(&MyGreatTestType{"john", 23}).toNotEqual(&MyGreatTestType{"john", 23})
-        Expect("foo").toEqual("foo")
-        Expect("foo").toNotEqual("bar")
+        Expect(&MyGreatTestType{"john", 23}, ToNotEqual, &MyGreatTestType{"john", 23})
+        Expect("foo", ToEqual, "foo")
+        Expect("foo", ToNotEqual, "bar")
       })
       It("matches for typed-nil", func() {
-        Expect(MyNil()).toBeNil()
-        Expect(MyNonNil()).toNotBeNil()
+        Expect(MyNil(), ToBeNil)
+        Expect(MyNonNil(), ToNotBeNil)
       })
       It("matches for nil", func() {
-        Expect(nil).toBeNil()
-        Expect(true).toNotBeNil()
+        // Expect(nil, ToBeNil)
+        Expect(true, ToNotBeNil)
       })
     })
     Describe("deep equals matcher", func() {
       It("matches what equals does not", func() {
-        Expect(&MyGreatTestType{"john", 23}).toDeepEqual(&MyGreatTestType{"john", 23})
-        Expect("foo").toDeepEqual("foo")
+        Expect(&MyGreatTestType{"john", 23}, ToDeepEqual, &MyGreatTestType{"john", 23})
+        Expect("foo", ToDeepEqual, "foo")
       })
     })
     Describe("exception-rescuing matchers", func() {
       It("is super cool", func() {
-        Expect(func() { panic("foobar!") }).toPanicWith("foobar!")
-        Expect(func() {}).toNotPanic()
+        Expect(func() { panic("foobar!") }, ToPanicWith, "foobar!")
+        Expect(func() {}, ToNotPanic)
       })
     })
   })
