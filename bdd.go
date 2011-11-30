@@ -45,10 +45,10 @@ func It(s string, f func()) {
       beforeFunc()
     }
   }
-  
+
   testingCurrentIt = s
   testingExamples++
-  
+
   f()
 }
 
@@ -77,16 +77,16 @@ func appendValueFor(array []reflect.Value, obj interface{}) []reflect.Value {
 
 func Expect(obj interface{}, test interface{}, args ...interface{}) {
   var argValues []reflect.Value
-  
+
   argValues = appendValueFor(argValues, obj)
   for _, v := range args {
     argValues = appendValueFor(argValues, v)
   }
-  
+
   // fmt.Println(obj, reflect.ValueOf(obj), argValues, reflect.TypeOf(obj) == nil)
   returnValues := reflect.ValueOf(test).Call(argValues)
   str, ok := returnValues[0].String(), returnValues[1].Bool()
-  
+
   if !ok {
     addErrorObject(str)
   }
@@ -129,7 +129,7 @@ func ToDeepEqual(actual interface{}, expected interface{}) (string, bool) {
 
 func ToPanicWith(actual interface{}, expected interface{}) (string, bool) {
   actual = rescueException(actual.(func()))
-  
+
   if actual != expected {
     return fmt.Sprintf("expected panic: %v\n           got: %v\n", expected, actual), false
   }
@@ -138,7 +138,7 @@ func ToPanicWith(actual interface{}, expected interface{}) (string, bool) {
 
 func ToNotPanic(actual interface{}) (string, bool) {
   actual = rescueException(actual.(func()))
-  
+
   if actual != nil {
     return fmt.Sprintf("expected no panic,\n          but got: %v\n", actual), false
   }
@@ -159,7 +159,7 @@ func addErrorObject(s string) {
   for _, testingContext := range testingContexts {
     contexts = append(contexts, testingContext.Description)
   }
-  
+
   testingErrors = append(testingErrors, &testingError{
     String: s,
     ItString: testingCurrentIt,
@@ -172,9 +172,9 @@ func addErrorObject(s string) {
 
 func BuildSpecReport() (string, bool) {
   var s string
-  
+
   ok := len(testingErrors) == 0
-  
+
   if !ok {
     s += redColor
 
@@ -196,23 +196,23 @@ func BuildSpecReport() (string, bool) {
     s += fmt.Sprintf("All tests passed. %d examples. 0 failures.\n", testingExamples)
     s += resetColors
   }
-  
+
   return s, ok
 }
 
 func PrintSpecReport() {
   report, ok := BuildSpecReport()
-  
+
   stream := specReportStream
   if stream == nil {
     stream = os.Stdout
   }
   fmt.Fprintf(stream, report)
-  
+
   if !ok && !debugTesting {
     os.Exit(1)
   }
-  
+
   testingContexts = testingContexts[0:0]
   testingErrors = testingErrors[0:0]
   testingExamples = 0

@@ -10,12 +10,12 @@ import (
 
 func TestDescribe(t *testing.T) {
   i := 0
-  
+
   Describe("foo", func() {
     assertEqualObjects(t, len(testingContexts), 1)
     assertEqualObjects(t, testingContexts[0].Description, "foo")
     i++
-    
+
     Describe("bar", func() {
       assertEqualObjects(t, len(testingContexts), 2)
       assertEqualObjects(t, testingContexts[0].Description, "foo")
@@ -23,52 +23,52 @@ func TestDescribe(t *testing.T) {
       i++
     })
   })
-  
+
   assertEqualObjects(t, i, 2)
   assertEqualObjects(t, len(testingContexts), 0)
 }
 
 func TestIt(t *testing.T) {
   i := 0
-  
+
   Describe("foo", func() {
     It("is very cool", func() {
       assertEqualObjects(t, testingCurrentIt, "is very cool")
       i++
     })
   })
-  
+
   assertEqualObjects(t, i, 1)
 }
 
 func TestBeforeEach(t *testing.T) {
   Describe("foo", func() {
     i := 0
-    
+
     BeforeEach(func() {
       i++
     })
-    
+
     It("will run", func() {
       assertEqualObjects(t, i, 1)
     })
-    
+
     It("will run here too", func() {
       assertEqualObjects(t, i, 2)
     })
-    
+
     Describe("bar", func() {
       j := 0
-      
+
       BeforeEach(func() {
         j++
       })
-      
+
       It("will run", func() {
         assertEqualObjects(t, j, 1)
         assertEqualObjects(t, i, 3)
       })
-    
+
       It("will run here too", func() {
         assertEqualObjects(t, j, 2)
         assertEqualObjects(t, i, 4)
@@ -86,13 +86,13 @@ func TestEqualAssertion(t *testing.T) {
       })
     })
   })
-  
+
   assertEqualObjects(t, len(testingErrors), 1)
   assertEqualObjects(t, testingErrors[0].String, "expected: 23\n     got: 24\n")
   assertDeepEqualObjects(t, testingErrors[0].Contexts, []string{"foo", "bar"})
   fmt.Println(testingErrors[0].ErrorLine)
   assertEqualObjects(t, strings.HasSuffix(testingErrors[0].ErrorLine, "bdd_test.go:83"), true)
-  
+
   testingErrors = testingErrors[0:0] // cleanup.. bleh
 }
 
@@ -107,7 +107,7 @@ func TestPrintSpecReport(t *testing.T) {
       })
     })
   })
-  
+
   report, ok := BuildSpecReport()
   assertEqualObjects(t, ok, false)
   assertEqualObjects(t,
@@ -117,7 +117,7 @@ func TestPrintSpecReport(t *testing.T) {
     strings.Contains(report, testingErrors[0].Contexts[1]) &&
     strings.Contains(report, "is cool"),
     true)
-  
+
   stream := bytes.NewBufferString("")
   specReportStream = stream
   debugTesting = true
@@ -136,7 +136,7 @@ func TestPrintGreen(t *testing.T) {
       })
     })
   })
-  
+
   report, ok := BuildSpecReport()
   assertEqualObjects(t, ok, true)
   assertEqualObjects(t,
@@ -148,16 +148,16 @@ func TestPrintGreen(t *testing.T) {
 
 func init() {
   defer PrintSpecReport()
-  
+
   type MyGreatTestType struct {
     Name string
     Age int
   }
-  
+
   MyNil := func() *MyGreatTestType {
     return nil
   }
-  
+
   MyInterfaceNil := func() interface{} {
     return nil
   }
@@ -165,72 +165,72 @@ func init() {
   MyNonNil := func() *MyGreatTestType {
     return &MyGreatTestType{}
   }
-  
+
   var anObject *MyGreatTestType
-  
+
   Describe("matchers", func() {
-    
+
     BeforeEach(func() {
       anObject = new(MyGreatTestType)
       anObject.Name = "john"
       anObject.Age = 23
     })
-    
+
     Describe("not equals", func() {
-      
+
       It("matches on simple objects", func() {
         Expect(&MyGreatTestType{"john", 23}, ToNotEqual, anObject)
         Expect("foo", ToEqual, "foo")
         Expect("foo", ToNotEqual, "bar")
       })
-      
+
       It("matches for typed-nil", func() {
         Expect(MyNil(), ToBeNil)
         Expect(MyInterfaceNil(), ToBeNil)
         Expect(MyNonNil(), ToNotBeNil)
       })
-      
+
       It("matches for nil", func() {
         Expect(nil, ToBeNil)
         Expect(true, ToNotBeNil)
       })
-      
+
     })
-    
+
     Describe("deep equals matcher", func() {
-      
+
       It("matches what equals does not", func() {
         Expect(&MyGreatTestType{"john", 23}, ToDeepEqual, anObject)
         Expect("foo", ToDeepEqual, "foo")
       })
-      
+
     })
-    
+
     Describe("exception-rescuing matchers", func() {
-      
+
       It("is super cool", func() {
         Expect(func() { panic("foobar!") }, ToPanicWith, "foobar!")
         Expect(func() {}, ToNotPanic)
       })
-      
+
       Describe("custom matchers", func() {
         It("can take your own specified number of arguments", func() {
           Expect("foo", ToBeInside, []string{"foo"})
         })
       })
-      
+
     })
-    
+
   })
 }
 
 func ToBeInside(obj interface{}, array []string) (string, bool) {
   found := false
-  
+
   for _, v := range array {
     if obj == v { found = true }
   }
-  
+
   if !found {
     return fmt.Sprintf(
 		"expected to find: %v\n"+
@@ -254,7 +254,7 @@ func assertEqualObjects(t *testing.T, obj interface{}, expected interface{}) {
 func TestExceptions(t *testing.T) {
   foo := rescueException(func() { panic("foo") })
   assertEqualObjects(t, foo, "foo")
-  
+
   none := rescueException(func() {})
   assertEqualObjects(t, none, nil)
 }
