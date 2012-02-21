@@ -49,7 +49,7 @@ func It(s string, f func()) {
   testingCurrentIt = s
   testingExamples++
 
-  f()
+  Expect(func() { f() }, ToNotPanic)
 }
 
 func BeforeEach(f func()) {

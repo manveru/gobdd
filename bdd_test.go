@@ -211,6 +211,18 @@ func init() {
       It("is super cool", func() {
         Expect(func() { panic("foobar!") }, ToPanicWith, "foobar!")
         Expect(func() {}, ToNotPanic)
+
+        panicky := func() int {
+          panic("sup")
+          return 4; // chosen by fair dice roll.
+                    // guaranteed to be random.
+        }
+
+        Expect(func() {
+          It("doesnt panic in here", func() {
+            Expect(panicky(), ToEqual, 4)
+          })
+        }, ToNotPanic)
       })
 
       Describe("custom matchers", func() {
