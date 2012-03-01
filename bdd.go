@@ -130,8 +130,15 @@ func ToDeepEqual(actual interface{}, expected interface{}) (string, bool) {
 func ToPanicWith(actual interface{}, expected interface{}) (string, bool) {
   actual = rescueException(actual.(func()))
 
-  if actual != expected {
-    return fmt.Sprintf("expected panic: %v\n           got: %v\n", expected, actual), false
+  switch actual.(type) {
+  case error:
+    if actual.(error).Error() != expected {
+      return fmt.Sprintf("expected panic: %v\n           got: %v\n", expected, actual), false
+    }
+  default:
+    if actual != expected {
+      return fmt.Sprintf("expected panic: %v\n           got: %v\n", expected, actual), false
+    }
   }
   return "", true
 }

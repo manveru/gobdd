@@ -210,6 +210,10 @@ func init() {
 
       It("is super cool", func() {
         Expect(func() { panic("foobar!") }, ToPanicWith, "foobar!")
+        Expect(func() {
+          a := []int{1, 2, 3}
+          _ = a[5]
+        }, ToPanicWith, "runtime error: index out of range")
         Expect(func() {}, ToNotPanic)
 
         panicky := func() int {
