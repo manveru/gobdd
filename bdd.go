@@ -94,21 +94,21 @@ func Expect(obj interface{}, test interface{}, args ...interface{}) {
 
 func ToEqual(actual interface{}, expected interface{}) (string, bool) {
   if actual != expected {
-    return fmt.Sprintf("expected: %v\n     got: %v\n", expected, actual), false
+    return fmt.Sprintf("expected: %#v\n     got: %#v\n", expected, actual), false
   }
   return "", true
 }
 
 func ToNotEqual(actual interface{}, expected interface{}) (string, bool) {
   if expected == actual {
-    return fmt.Sprintf(" expected: %v\nto not be: %v\n", expected, actual), false
+    return fmt.Sprintf(" expected: %#v\nto not be: %#v\n", expected, actual), false
   }
   return "", true
 }
 
 func ToBeNil(actual interface{}) (string, bool) {
   if !reflect.DeepEqual(reflect.ValueOf(nil), reflect.Indirect(reflect.ValueOf(actual))) {
-    return fmt.Sprintf("expected to be nil,\n           but got: %v\n", actual), false
+    return fmt.Sprintf("expected to be nil,\n           but got: %#v\n", actual), false
   }
   return "", true
 }
@@ -122,7 +122,7 @@ func ToNotBeNil(actual interface{}) (string, bool) {
 
 func ToDeepEqual(actual interface{}, expected interface{}) (string, bool) {
   if !reflect.DeepEqual(actual, expected) {
-    return fmt.Sprintf("    expected: %v\nto deeply be: %v\n", expected, actual), false
+    return fmt.Sprintf("    expected: %#v\nto deeply be: %#v\n", expected, actual), false
   }
   return "", true
 }
@@ -147,7 +147,7 @@ func ToNotPanic(actual interface{}) (string, bool) {
   actual = rescueException(actual.(func()))
 
   if actual != nil {
-    return fmt.Sprintf("expected no panic,\n          but got: %v\n", actual), false
+    return fmt.Sprintf("expected no panic,\n          but got: %#v\n", actual), false
   }
   return "", true
 }
