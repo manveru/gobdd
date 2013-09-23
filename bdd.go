@@ -13,6 +13,7 @@ import (
 type context struct {
   Description string
   BeforeEach func()
+  AfterEach func()
 }
 
 type testingError struct {
@@ -50,10 +51,22 @@ func It(s string, f func()) {
   testingExamples++
 
   Expect(func() { f() }, ToNotPanic)
+
+  /*
+  for _, testingContext := range testingContexts {
+    if afterFunc := testingContext.AfterEach; afterFunc != nil {
+      afterFunc()
+    }
+  }
+  */
 }
 
 func BeforeEach(f func()) {
   testingContexts[len(testingContexts)-1].BeforeEach = f
+}
+
+func AfterEach(f func()) {
+  testingContexts[len(testingContexts)-1].AfterEach = f
 }
 
 func getErrorLine() string {
