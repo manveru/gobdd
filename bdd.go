@@ -52,13 +52,11 @@ func It(s string, f func()) {
 
   Expect(func() { f() }, ToNotPanic)
 
-  /*
   for _, testingContext := range testingContexts {
     if afterFunc := testingContext.AfterEach; afterFunc != nil {
       afterFunc()
     }
   }
-  */
 }
 
 func BeforeEach(f func()) {
